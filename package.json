@@ -1,0 +1,36 @@
+{
+  "name": "sample-website",
+  "version": "1.0.0",
+  "description": "A modern, responsive website with CI/CD pipeline",
+  "main": "index.html",
+  "scripts": {
+    "lint": "npm run lint:html && npm run lint:css && npm run lint:js",
+    "lint:html": "htmlhint index.html",
+    "lint:css": "stylelint styles.css --fix",
+    "lint:js": "eslint script.js --fix",
+    "test": "npm run test:integration",
+    "test:integration": "docker-compose up -d && sleep 15 && curl -f http://localhost:80 && docker-compose down",
+    "build": "docker build -t sample-website .",
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "clean": "docker system prune -f"
+  },
+  "keywords": [
+    "website",
+    "docker",
+    "nginx",
+    "ci-cd",
+    "github-actions"
+  ],
+  "author": "AI Challenge",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "htmlhint": "^1.1.4",
+    "stylelint": "^16.2.1",
+    "stylelint-config-standard": "^36.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
