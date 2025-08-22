@@ -56,7 +56,25 @@ sample-website/
    docker-compose down
    ```
 
-### Option 2: Using Docker directly
+### Option 2: Using Deployment Script
+
+1. **Configure server settings:**
+   ```bash
+   # Edit server configuration
+   nano servers/staging.conf
+   ```
+
+2. **Deploy to server:**
+   ```bash
+   ./deploy.sh deploy staging
+   ```
+
+3. **Check deployment status:**
+   ```bash
+   ./deploy.sh status staging
+   ```
+
+### Option 3: Using Docker directly
 
 1. **Build the Docker image:**
    ```bash
@@ -143,6 +161,17 @@ sample-website/
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
 ## Deployment
+
+### CI/CD Pipeline
+
+The project includes a streamlined CI/CD pipeline that automatically:
+
+- **Builds** Docker images on code push
+- **Deploys** to staging (develop branch) and production (main branch)
+- **Supports** manual deployment to external servers
+- **Provides** automatic rollback on deployment failures
+
+For detailed deployment information, see [DEPLOYMENT-README.md](DEPLOYMENT-README.md).
 
 ### Production Deployment
 

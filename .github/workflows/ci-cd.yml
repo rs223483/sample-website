@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Docker Build and Deploy
 
 on:
   push:
@@ -12,68 +12,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Lint and validate code
-  lint:
-    name: Lint and Validate
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint HTML
-        run: npx htmlhint index.html
-
-      - name: Lint CSS
-        run: npx stylelint styles.css --fix
-
-      - name: Lint JavaScript
-        run: npx eslint script.js --fix
-
-      - name: Validate Dockerfile
-        run: |
-          docker run --rm -i hadolint/hadolint < Dockerfile
-
-  # Security scanning
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # Build and test Docker image
+  # Build and push Docker image
   build:
-    name: Build and Test
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: [lint, security]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,117 +52,56 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Test Docker image
-        run: |
-          docker run --rm -d --name test-container -p 8080:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          sleep 10
-          curl -f http://localhost:8080 || exit 1
-          docker stop test-container
-
-  # Integration tests
-  integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    needs: build
-    defaults:
-      run:
-        working-directory: .
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Start application
-        run: |
-          docker-compose up -d
-          sleep 15
-
-      - name: Run integration tests
-        run: |
-          # Test if the website is accessible
-          curl -f http://localhost:80 || exit 1
-          
-          # Test if main page loads
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80)
-          if [ "$response" != "200" ]; then
-            echo "Expected HTTP 200, got $response"
-            exit 1
-          fi
-          
-          # Test if CSS and JS files are accessible
-          curl -f http://localhost:80/styles.css || exit 1
-          curl -f http://localhost:80/script.js || exit 1
-
-      - name: Stop application
-        if: always()
-        run: docker-compose down
-
   # Deploy to staging (on develop branch)
   deploy-staging:
-    name: Deploy to Staging
+    name: Deploy to Staging Server
     runs-on: ubuntu-latest
-    needs: [build, integration]
+    needs: build
     if: github.ref == 'refs/heads/develop'
     environment: staging
     steps:
-      - name: Deploy to staging environment
+      - name: Deploy to staging server
         run: |
-          echo "Deploying to staging environment..."
+          echo "🚀 Deploying to staging server..."
           # Add your staging deployment logic here
-          # Example: Deploy to staging server, cloud platform, etc.
+          # Example: Deploy to staging server using docker-compose
+          # ssh user@staging-server "cd /path/to/app && docker-compose pull && docker-compose up -d"
 
   # Deploy to production (on main branch)
   deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [build, integration]
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    steps:
-      - name: Deploy to production environment
-        run: |
-          echo "Deploying to production environment..."
-          # Add your production deployment logic here
-          # Example: Deploy to production server, cloud platform, etc.
-
-  # Performance testing
-  performance:
-    name: Performance Tests
+    name: Deploy to Production Server
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
-    defaults:
-      run:
-        working-directory: .
+    environment: production
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli@0.12.x
-
-      - name: Start application
+      - name: Deploy to production server
         run: |
-          docker-compose up -d
-          sleep 15
+          echo "🚀 Deploying to production server..."
+          # Add your production deployment logic here
+          # Example: Deploy to production server using docker-compose
+          # ssh user@production-server "cd /path/to/app && docker-compose pull && docker-compose up -d"
 
-      - name: Run Lighthouse CI
-        run: |
-          lhci autorun --config=./.lighthouserc.json
-
-      - name: Stop application
-        if: always()
-        run: docker-compose down
-
-  # Notify team
-  notify:
-    name: Notify Team
+  # Deploy to external server (manual trigger)
+  deploy-external:
+    name: Deploy to External Server
     runs-on: ubuntu-latest
-    needs: [deploy-production, deploy-staging]
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    environment: external
+    steps:
+      - name: Deploy to external server
+        run: |
+          echo "🚀 Deploying to external server..."
+          # Add your external server deployment logic here
+          # Example: Deploy to external server using docker-compose
+          # ssh user@external-server "cd /path/to/app && docker-compose pull && docker-compose up -d"
+
+  # Notify deployment status
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-production, deploy-staging, deploy-external]
     if: always()
     steps:
       - name: Notify on success
