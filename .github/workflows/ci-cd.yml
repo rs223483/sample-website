@@ -74,12 +74,18 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment: production
     steps:
-      - name: Deploy to production server
-        run: |
-          echo "🚀 Deploying to production server..."
-          # Add your production deployment logic here
-          # Example: Deploy to production server using docker-compose
-          ssh -i ${{ secrets.SSH_KEY }} ubuntu@107.20.211.209 "cd /home/ubuntu/sample-website && docker-compose pull && docker-compose up -d"
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.PROD_SERVER_IP }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to production server
+      run: |
+        echo "🚀 Deploying to production server..."
+        ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.PROD_SERVER_IP }} \
+          "cd /home/ubuntu/sample-website && docker-compose pull && docker-compose up -d"
 
   # Deploy to external server (manual trigger)
   # deploy-external:
