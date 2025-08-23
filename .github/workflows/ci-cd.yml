@@ -79,22 +79,22 @@ jobs:
           echo "🚀 Deploying to production server..."
           # Add your production deployment logic here
           # Example: Deploy to production server using docker-compose
-          # ssh -i ubuntu@production-server "cd /path/to/app && docker-compose pull && docker-compose up -d"
+          ssh -i ${ secrets.SSH_KEY } ubuntu@107.20.211.209 "cd /home/ubuntu/sample-website && docker-compose pull && docker-compose up -d"
 
   # Deploy to external server (manual trigger)
-  deploy-external:
-    name: Deploy to External Server
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'workflow_dispatch'
-    environment: external
-    steps:
-      - name: Deploy to external server
-        run: |
-          echo "🚀 Deploying to external server..."
-          # Add your external server deployment logic here
-          # Example: Deploy to external server using docker-compose
-          ssh -i ${ secrets.SSH_KEY } ubuntu@107.20.211.209 "cd /home/ubuntu/sample-website && docker-compose pull && docker-compose up -d"
+  # deploy-external:
+  #   name: Deploy to External Server
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   if: github.event_name == 'workflow_dispatch'
+  #   environment: external
+  #   steps:
+  #     - name: Deploy to external server
+  #       run: |
+  #         echo "🚀 Deploying to external server..."
+  #         # Add your external server deployment logic here
+  #         # Example: Deploy to external server using docker-compose
+  #         ssh -i ${ secrets.SSH_KEY } ubuntu@107.20.211.209 "cd /home/ubuntu/sample-website && docker-compose pull && docker-compose up -d"
 
   # Notify deployment status
   notify:
