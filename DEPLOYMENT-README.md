@@ -101,7 +101,7 @@ Each configuration file contains:
 SERVER_HOST="server.example.com"
 SSH_USER="deploy"
 APP_DIRECTORY="/opt/sample-website"
-IMAGE_NAME="ghcr.io/rs223483/sample-website"
+IMAGE_NAME="docker.io/mkbiloniya/sample-website"
 ```
 
 ### Required Variables
@@ -143,7 +143,7 @@ version: '3.8'
 
 services:
   sample-website:
-    image: ghcr.io/rs223483/sample-website:latest
+    image: docker.io/mkbiloniya/sample-website:latest
     container_name: sample-website
     restart: unless-stopped
     ports:

@@ -25,7 +25,7 @@ Code Push/PR → Lint & Validate → Security Scan → Build & Test → Integrat
 
 ### 3. **Build and Test** (`build`)
 - **Docker Build**: Builds the Docker image using Docker Buildx
-- **Image Registry**: Pushes to GitHub Container Registry (ghcr.io)
+- **Image Registry**: Pushes to Docker Hub (docker.io)
 - **Smart Tagging**: Automatic versioning based on git events
 - **Build Caching**: Optimized builds using GitHub Actions cache
 - **Smoke Test**: Basic functionality test of the built image
@@ -78,7 +78,7 @@ Code Push/PR → Lint & Validate → Security Scan → Build & Test → Integrat
 ### Prerequisites
 1. **GitHub Repository**: Ensure your code is in a GitHub repository
 2. **GitHub Actions**: Enable GitHub Actions in your repository settings
-3. **Container Registry**: Access to GitHub Container Registry (ghcr.io)
+3. **Container Registry**: Access to Docker Hub (docker.io)
 
 ### Initial Setup
 1. **Push the Configuration Files**:

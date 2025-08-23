@@ -9,7 +9,7 @@ on:
 
 env:
   DOCKER_REGISTRY: "docker.io"
-  DOCKER_INVENTORY_IMAGE_NAME: mkbiloniya/sample-website:${{ github.repository }}
+  DOCKER_IMAGE_NAME: "mkbiloniya/sample-website"
 
 jobs:
   # Build and push Docker image
@@ -33,7 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
