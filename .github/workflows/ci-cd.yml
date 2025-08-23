@@ -9,8 +9,8 @@ on:
 
 env:
   DOCKER_REGISTRY: "docker.io"
-  DOCKER_INVENTORY_IMAGE_NAME: mkbiloniya/${{ github.repository }}
-  
+  DOCKER_INVENTORY_IMAGE_NAME: mkbiloniya/sample-website:${{ github.repository }}
+
 jobs:
   # Build and push Docker image
   build:
